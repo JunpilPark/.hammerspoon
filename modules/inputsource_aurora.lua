@@ -1,28 +1,34 @@
 local boxes = {}
 local inputEnglish = "com.apple.keylayout.ABC"
+local unicodeHexLayout = "com.apple.keylayout.UnicodeHexInput"
 local box_height = 23
 local box_alpha = 0.35
 local RED = hs.drawing.color.osx_red
+local GREEN = hs.drawing.color.osx_green
 
 -- 입력소스 변경 이벤트에 이벤트 리스너를 달아준다
 hs.keycodes.inputSourceChanged(function()
     disable_show()
     if hs.keycodes.currentSourceID() ~= inputEnglish then
-        enable_show()
+        if(hs.keycodes.currentSourceID() == unicodeHexLayout) then
+            enable_show(GREEN)
+        else
+            enable_show(RED)
+        end
     end
 end)
 
-function enable_show()
+function enable_show(color)
     reset_boxes()
     hs.fnutils.each(hs.screen.allScreens(), function(scr)
         local frame = scr:fullFrame()
 
         local box = newBox()
-        draw_rectangle(box, frame.x, frame.y, frame.w, box_height, RED)
+        draw_rectangle(box, frame.x, frame.y, frame.w, box_height, color)
         table.insert(boxes, box)
 
         local box2 = newBox()
-        draw_rectangle(box2, frame.x, frame.y + frame.h - 10, frame.w, box_height, RED)
+        draw_rectangle(box2, frame.x, frame.y + frame.h - 10, frame.w, box_height, color)
         table.insert(boxes, box2)
     end)
 end
